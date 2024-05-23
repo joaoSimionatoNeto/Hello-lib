@@ -18,23 +18,23 @@ public class LivroController {
 	@Autowired
 	private LivroRepository livroRepository;
 
-	@GetMapping("/api/livro")
+	@GetMapping("/api/livros")
 	Iterable<Livro> getLivro() {
 		return livroRepository.findAll();
 	}
 	
-	@GetMapping("/api/livro/{id}")
+	@GetMapping("/api/livros/{id}")
 	Optional<Livro> getLivro(@PathVariable long id) {
 		return livroRepository.findById(id);
 	}
 	
-	@PostMapping("/api/livro")
+	@PostMapping("/api/livros")
 	Livro createLivro(@RequestBody Livro l) {
 		Livro createdLivro = livroRepository.save(l);
 		return createdLivro;
 	}
 	
-	@PutMapping("/api/livro/{livroId}")
+	@PutMapping("/api/livros/{livroId}")
 	Optional<Livro> updateLivro(@RequestBody Livro livroReq, @PathVariable long livroId) {
 		Optional<Livro> opt = livroRepository.findById(livroId);
 		if (opt.isPresent()) {
@@ -46,7 +46,7 @@ public class LivroController {
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Erro ao alterar dados do livro com id " + livroId);
 	}	
 	
-	@DeleteMapping("/api/livro/{id}")
+	@DeleteMapping("/api/livros/{id}")
 	void deleteLivro(@PathVariable long id) {
 		livroRepository.deleteById(id);
 	}	

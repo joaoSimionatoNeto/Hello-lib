@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Livros</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
+        <link rel="stylesheet" href="style/form-login.css">
+        <link rel="stylesheet" href="style/form-cadastro.css">
+        <link rel="stylesheet" href="style/header.css">
+    </head>
+    
+    <body>
+
+        <header>
+            <img src="img/logo_pequena.png" alt="Company Logo">
+            <nav>
+              <ul>
+                <li><a href="livros.html">Livro</a></li>
+                <li><a href="editoras.html">Editora</a></li>
+                <li><a href="usuarios.html">Usuario</a></li>
+              </ul>
+            </nav>
+          </header>
+             <div class="formCadastro-container">
+            <h2>Gerenciamento de Livros</h2>
+            <div class="form-cadastro">
+                <input type="text" placeholder="ID" id="id">
+                <input type="text" placeholder="Título" id="titulo">
+                <input type="text" placeholder="Ano" id="ano">
+                <input type="text" placeholder="Autor" id="autor">
+                <input type="text" placeholder="Genero" id="genero">
+                <select id="select-field" id="editora">
+                    <option value="">Selecione...</option>
+                </select>
+                <div class="button-container">
+                    <button onclick="novoLivro()" id="btnNovo">Cadastrar</button>
+                    <button onclick="salvarLivro()" id="btnSalvar">Atualizar</button>
+                    <button onclick="apagarLivro()" id="btnApagar">Deletar</button>
+                    <button onclick="cancelarEdicao()" id="btnCancelar">Cancelar</button>
+                </div>
+            </div>
+        </div>
+        
+
+
+        <p style="font-weight:bold" id="paragrafoMensagem"></p>
+
+        <table>    
+            <tr> <th>ID</th> <th>Título</th> <th>Autor</th> <th>Gênero</th> <th>Editora</th> </tr>   
+                                           
+            <tbody id="corpoTabelaLivros"> </tbody>
+        </table>
+        
+        
+        <script>
+        
+var token = localStorage.getItem('token');
+if (!token) {
+	window.location.replace("/html/login.html");
+}
+const txtId = document.querySelector('#id');
+const corpoTabela = document.querySelector('#corpoTabelaLivros');
+const paragrafoMensagem = document.querySelector('#paragrafoMensagem');
+const txtTitulo = document.querySelector('#titulo');
+const txtAno = document.querySelector('#ano');
+const txtAutor = document.querySelector('#autor');
+const txtGenero = document.querySelector('#genero');
+const txtEditora = document.querySelector('#editora');
+const btnNovo = document.querySelector('#btnNovo');
+const btnSalvar = document.querySelector('#btnSalvar');
+const btnApagar = document.querySelector('#btnApagar');
+const btnCancelar = document.querySelector('#btnCancelar');
+var criandoNovoLivro = false;
+inicializar();
+
+function inicializar() {
+    paragrafoMensagem.innerHTML =  'Pressione o botão Novo ou selecione um livro da lista:';
+    txtId.value = '';
+    txtTitulo.value = '';
+    txtAutor.value = '';
+    txtAno.value = '';
+    txtGenero.value='';
+    txtEditora.value = '';
+    txtTitulo.disabled = true;
+    txtAno.disabled = true;
+    txtAutor.disabled = true;
+    btnNovo.disabled = false;
+    btnSalvar.disabled = true;
+    btnApagar.disabled = true;
+    btnCancelar.disabled = true;
+    criandoNovoLivro = false;
+    listarTodosLivros();
+}
+
+function getEditoras(){
+    const selectField = document.getElementById('select-field');
+
+    fetch('/api/editoras' ,{
+        method: 'GET',
+        headers: {'Authorization': 'Bearer ' + token }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Processar dados da API aqui (ex: filtrar, ordenar)
+        const options = data.map(item => {
+        return `<option value="${item}">${item.name}</option>`;
+        });
+    });
+}
+
+async function listarTodosLivros() {
+	fetch('/api/livros' ,{
+        method: 'GET',
+        headers: {'Authorization': 'Bearer ' + token }
+    })
+    .then(resposta => { if (!resposta.ok) throw Error(resposta.status); return resposta; } )
+    .then(resposta => resposta.json())
+    .then(json => preencherTabela(json))
+    .catch(function(error) {
+        paragrafo.innerHTML = "Erro ao listar livros (código " + error.message + ")";
+    });
+}
+
+function preencherTabela(livros) {
+	var linhasTabela = '';
+	var n = livros.length;
+	for (var i=0; i<n; i++) {
+		var p = livros[i];
+		linhasTabela += 
+			`<tr> ` + 
+            `<td><a href="javascript:void(0)" onclick="selecionarLivro('${p.id}', '${p.titulo}', '${p.autor}', '${p.ano}' '${p.editora}' '${p.genero}')">${p.id}</a></td>`
+             + ` <td>${p.titulo}</td> <td>${p.ano}</td> <td>${p.autor}</td> <td>${p.genero}</td> <td>${p.editora}</td></tr> \n`;
+	}
+	corpoTabela.innerHTML = linhasTabela;
+}
+
+function novoLivro() {
+    paragrafoMensagem.innerHTML = 'Preencha os dados do novo livro...';
+    txtId.disabled = true;
+    txtTitulo.disabled = false;
+    txtAno.disabled = false;
+    txtAutor.disabled = false;
+    btnNovo.disabled = true;
+    btnSalvar.disabled = false;
+    btnApagar.disabled = true;
+    btnCancelar.disabled = false;
+    criandoNovoLivro = true;
+}
+
+async function salvarLivro() {
+    if (criandoNovoLivro) {
+        fetch('/api/livros', {
+            method: 'POST',
+            body: JSON.stringify({
+                'nome': txtTitulo.value,
+                'matricula': txtAno.value,
+                'area': txtAutor.value
+            }),
+            headers: {
+            	'Content-type': 'application/json',
+            	'Authorization': 'Bearer ' + token
+            }
+        })
+        .then(resposta => { if (!resposta.ok) throw Error(resposta.status); return resposta; } )
+        .then(resposta => resposta.json())
+        .then(json => inicializar())
+        .catch(function(error) {
+            paragrafo.innerHTML = "Erro ao criar livro (código " + error.message + ")";
+        });  
+    }
+    else {
+        fetch('/api/livros/' + txtId.value, {
+            method: 'PUT',
+            body: JSON.stringify({
+                'id': txtId.value,
+                'nome': txtTitulo.value,
+                'matricula': txtAno.value,
+                'area': txtAutor.value
+            }),
+            headers: {
+            	'Content-type': 'application/json',
+            	'Authorization': 'Bearer ' + token
+            }
+        })
+        .then(resposta => { if (!resposta.ok) throw Error(resposta.status); return resposta; } )
+        .then(resposta => resposta.json())
+        .then(json => inicializar())
+        .catch(function(error) {
+            paragrafo.innerHTML = "Erro ao alterar livro (código " + error.message + ")";
+        });         
+    }  
+}
+
+function cancelarEdicao() {
+	inicializar();
+}
+
+function selecionarLivro(id, titulo, autor, area, ano, editora, genero) {
+    paragrafoMensagem.innerHTML = 'Altere e salve os dados do livro, ou então apague o registro do livro.'
+    txtId.value = id;
+    txtTitulo.value = titulo;
+    txtAno.value = ano;
+    txtAutor.value = autor;
+    txtEditora.value = editora;
+    txtEditora.innerHTML= editora.nome;
+    txtTitulo.disabled = false;
+    txtAno.disabled = false;
+    txtAutor.disabled = false;
+    btnNovo.disabled = true;
+    btnSalvar.disabled = false;
+    btnApagar.disabled = false;
+    btnCancelar.disabled = false; 
+}
+
+async function apagarLivro() {
+	fetch('/api/livros/' + txtId.value, {
+        method: 'DELETE',
+        headers: {'Authorization': 'Bearer ' + token }
+    })
+    .then(resposta => { if (!resposta.ok) throw Error(resposta.status); return resposta; } )
+    .then(resposta => inicializar())
+    .catch(function(error) {
+        paragrafo.innerHTML = "Erro ao apagar livro (código " + error.message + ")";
+    });
+}
+
+function logout() {
+	localStorage.removeItem('token');
+	window.location.replace("/html/login.html");
+}
+
+        </script>
+	</body>
+</html>	        

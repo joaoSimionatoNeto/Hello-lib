@@ -1,5 +1,5 @@
-br/mackenzie/webapp/professor/ProfessorController.class
 br/mackenzie/webapp/WebApp.class
+br/mackenzie/webapp/professor/ProfessorController.class
 br/mackenzie/webapp/security/config/JwtRequestFilter.class
 br/mackenzie/webapp/editora/Editora.class
 br/mackenzie/webapp/security/model/DAOUser.class
