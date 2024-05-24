@@ -63,4 +63,8 @@ public class DAOUser {
 		this.livros = livros;
 	}
 
+	public long getId(){
+		return id;
+	}
+
 }

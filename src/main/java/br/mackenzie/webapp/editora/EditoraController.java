@@ -18,23 +18,23 @@ public class EditoraController {
 	@Autowired
 	private EditoraRepository editoraRepository;
 
-	@GetMapping("/api/editora")
+	@GetMapping("/api/editoras")
 	Iterable<Editora> getEditora() {
 		return editoraRepository.findAll();
 	}
 	
-	@GetMapping("/api/editora/{id}")
+	@GetMapping("/api/editoras/{id}")
 	Optional<Editora> getEditora(@PathVariable long id) {
 		return editoraRepository.findById(id);
 	}
 	
-	@PostMapping("/api/editora")
+	@PostMapping("/api/editoras")
 	Editora createEditora(@RequestBody Editora e) {
 		Editora createdEditora = editoraRepository.save(e);
 		return createdEditora;
 	}
 	
-	@PutMapping("/api/editora/{editoraId}")
+	@PutMapping("/api/editoras/{editoraId}")
 	Optional<Editora> updateEditora(@RequestBody Editora editoraReq, @PathVariable long editoraId) {
 		Optional<Editora> opt = editoraRepository.findById(editoraId);
 		if (opt.isPresent()) {
@@ -46,7 +46,7 @@ public class EditoraController {
 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Erro ao alterar dados da editora com id " + editoraId);
 	}	
 	
-	@DeleteMapping("/api/editora/{id}")
+	@DeleteMapping("/api/editoras/{id}")
 	void deleteEditora(@PathVariable long id) {
 		editoraRepository.deleteById(id);
 	}	

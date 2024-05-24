@@ -6,7 +6,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import br.mackenzie.webapp.editora.Editora;
-import br.mackenzie.webapp.security.model.DAOUser;
+import br.mackenzie.webapp.autor.Autor;
 @Entity
 @Table(name="livro")
 public class Livro {
@@ -15,11 +15,19 @@ public class Livro {
 	private long id;
 	private String titulo;
 	private String ano;
-	private String autor;
+	private String publicoAlvo;
   private String genero;
 
-	@ManyToOne
-	private DAOUser usuario;
+  @ManyToOne
+  private Autor autor;
+
+	public Autor getAutor() {
+	return autor;
+}
+
+public void setAutor(Autor autor) {
+	this.autor = autor;
+}
 
 	@ManyToOne
 	private Editora editora;
@@ -46,11 +54,11 @@ public class Livro {
 	public void setAno(String ano) {
 		this.ano = ano;
 	}
-	public String getAutor() {
-		return autor;
+	public String getPublicoAlvo() {
+		return publicoAlvo;
 	}
-	public void setAutor(String autor) {
-		this.autor = autor;
+	public void setPublicoAlvo(String publicoAlvo) {
+		this.publicoAlvo = publicoAlvo;
 	}
 
 	public String getGenero() {
@@ -61,13 +69,7 @@ public class Livro {
 		this.genero = genero;
 	}
 
-	public DAOUser getDAOUser() {
-		return usuario;
-	}
 
-	public void setDAOUser(DAOUser usuario) {
-		this.usuario = usuario;
-	}
 
 	public Editora getEditora() {
 		return editora;
